@@ -1,5 +1,6 @@
 import random
 import hashlib
+import base64
 from os import urandom
 from math import ceil
 from hashlib import sha1, sha3_256
@@ -7,7 +8,7 @@ from operator import xor
 
 
 class RSA:
-    def _init_(self, bits=1024):
+    def __init__(self, bits=1024):
         self.bits = bits
         self.p = self.generate_primes()
         self.q = self.generate_primes()
@@ -146,3 +147,25 @@ class RSA:
         #Obtém o texto plano
         plaintext = self.OAEP_decode(OAEP_message.to_bytes(k,"big"))
         return plaintext
+    
+    # Realiza a assinatura da mensagem com a chave privada
+    def signature(self, chave_privada, mensagem):
+        # Calcula o hash da mensagem
+        hash_mensagem = sha3_256(mensagem.encode('utf-8')).digest()
+        n, d = chave_privada
+        # Converte o hash para um número inteiro e assina com a chave privada usando o RSA
+        assinatura = pow(int.from_bytes(hash_mensagem, "big"), d, n)
+        # Retorna a assinatura formatada em Base64
+        return base64.b64encode(assinatura.to_bytes((n.bit_length() + 7) // 8, "big"))
+
+    # Verifica a assinatura da mensagem com a chave pública
+    def verify_signature(self, chave_publica, mensagem, assinatura_base64):
+        # Calcula o hash da mensagem
+        hash_mensagem = sha3_256(mensagem.encode('utf-8')).digest()
+        n, e = chave_publica
+        # Decodifica a assinatura de Base64 para bytes e converte para um número inteiro
+        assinatura = int.from_bytes(base64.b64decode(assinatura_base64), "big")
+        # Verifica a assinatura com a chave pública
+        hash_calculado = pow(assinatura, e, n)
+        # Compara o hash calculado com o hash da mensagem original
+        return hash_calculado.to_bytes((n.bit_length() + 7) // 8, "big")[-32:] == hash_mensagem
