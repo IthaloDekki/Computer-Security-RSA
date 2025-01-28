@@ -1,20 +1,21 @@
-from RSA import RSA
+import RSA
 
-mensagem = int(input("Digite a mensagem que deseja ser codificada: "))
+mensagem = input("Digite a mensagem que deseja ser codificada: ")
 
 rsa = RSA(bits=1024)
 print("Primo p:", rsa.p)
 print("Primo q:", rsa.q)
 print("N (p * q):", rsa.n)
 
+
 # Teste de cifração e decifração
-cifrada = rsa.Encrypt(mensagem.to_bytes(4, "big"))
-decifrada = rsa.Decrypt(cifrada)
+cifrada = rsa.Encrypt(mensagem.encode())
+decifrada = rsa.Decrypt(cifrada).decode()
 
 print("\n--- Cifração e Decifração ---")
 print("Mensagem original:", mensagem)
 print("Mensagem cifrada:", cifrada)
-print("Mensagem decifrada:", int.from_bytes(decifrada))
+print("Mensagem decifrada:", decifrada)
 
 # Geração de chaves pública e privada
 n = rsa.n
