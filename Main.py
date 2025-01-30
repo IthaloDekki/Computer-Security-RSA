@@ -2,7 +2,7 @@ import RSA
 
 mensagem = input("Digite a mensagem que deseja ser codificada: ")
 
-rsa = RSA(bits=1024)
+rsa = RSA.RSA(bits=1024)
 print("Primo p:", rsa.p)
 print("Primo q:", rsa.q)
 print("N (p * q):", rsa.n)
@@ -21,9 +21,15 @@ print("Mensagem decifrada:", decifrada)
 n = rsa.n
 e = rsa.choicePublicExponent(rsa.p, rsa.q)  # Expoente público
 d = rsa.choicePrivateExponent()  # Expoente privado
-
 chave_publica = (n, e)
 chave_privada = (n, d)
+print("\n --- Assinatura da mensagem do input---")
+assinatura_input = rsa.signature(chave_privada,mensagem)
+print("Assinatura gerada (Base64):,", assinatura_input.decode('utf-8'))
+if rsa.verify_signature(chave_publica,mensagem, assinatura_input):
+    print(" A assinatura é válida!")
+else:
+    print("A assinatura é inválida!")
 
 mensagem_clara = "Essa é uma mensagem de teste para assinatura RSA!"
 
